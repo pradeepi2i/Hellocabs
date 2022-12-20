@@ -10,15 +10,14 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class RideServiceImplTest {
@@ -26,6 +25,9 @@ public class RideServiceImplTest {
     @Mock
     RideRepository rideRepository;
     Ride ride;
+
+    @Mock
+    CabServiceImplTest cabServiceImplTest;
 
     public static Integer id() {
         return 10;
@@ -45,6 +47,8 @@ public class RideServiceImplTest {
         ride.setRidePickedTime(LocalDateTime.parse("2022-11-05T13:58:29"));
         ride.setPassengerMobileNumber(Long.valueOf("9876543212"));
         ride.setRideStatus("Cancelled");
+
+        //cabServiceImplTest = new CabServiceImplTest();
     }
 
     @Test
@@ -80,10 +84,10 @@ public class RideServiceImplTest {
 
     @Test
     void UpdateRideNonExistedId() {
-        Ride ride1 = new Ride();
-        ride1.setId(2);
+        Ride anotherRide = new Ride();
+        anotherRide.setId(2);
         when(rideRepository.save(ride)).thenReturn(ride);
-        assertNotEquals(ride, rideRepository.save(ride1), "No Id found");
+        assertNotEquals(ride, rideRepository.save(anotherRide), "No Id found");
     }
 
     @Test
@@ -97,8 +101,57 @@ public class RideServiceImplTest {
 
 
     @Test
+    void updateRideStatusEmptyString() {
+        ride.setRideStatus("");
+        when(rideRepository.save(ride)).thenReturn(ride);
+        assertEquals("", rideRepository.save(ride).getRideStatus());
+    }
+
+    @Test
+    void updateRideStatusNull() {
+        ride.setRideStatus(null);
+        when(rideRepository.save(ride)).thenReturn(ride);
+        assertEquals(null, rideRepository.save(ride).getRideStatus());
+        //assertEquals(null, doThrow(new NoSuchElementException("Can't assign null to status")));
+    }
+
+
+    @Test
     void deleteRide() {
         rideRepository.deleteById(1);
         verify(rideRepository, times(1)).deleteById(1);
+    }
+
+    @Test
+    void confirmRide() {
+        getRideSuccess();
+        getRideFailure();
+        cabServiceImplTest.getCabSuccess();
+        cabServiceImplTest.getCabFailure();
+
+    }
+
+    @Test
+    void updateStatusInfo() {
+        updateRideStatusSuccess();
+        updateRideStatusEmptyString();
+        updateRideStatusNull();
+        cabServiceImplTest.updateCabStatusSuccess();
+        cabServiceImplTest.updateCabStatusEmptyString();
+        cabServiceImplTest.updateCabStatusNull();
+    }
+
+    @Test
+    void waitingToConfirmRideSuccess() {
+        getRideSuccess();
+        updateRideStatusSuccess();
+    }
+
+    @Test
+    void waitingToConfirmRideFailure() {
+        getRideSuccess();
+        getRideFailure();
+        updateRideStatusNull();
+        updateRideStatusEmptyString();
     }
 }
