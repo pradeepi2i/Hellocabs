@@ -56,6 +56,7 @@ public class CabServiceImpl implements CabService {
     @Override
     public CabDto createCab(CabDto cabDto) {
 
+        //assert cabDto.getDriverName() != null : "Driver name must not be null";
         if (HelloCabsValidation.isValidMobileNumber(cabDto.getMobileNumber())
                 && !cabRepository.existsByMobileNumberOrEmail(
                         cabDto.getMobileNumber(), cabDto.getEmail())) {

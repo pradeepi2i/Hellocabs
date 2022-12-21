@@ -210,6 +210,9 @@ public class RideServiceImpl implements RideService {
      *
      */
     public RideDto bookRide(BookDto bookDto) {
+        assert bookDto.getCustomerId() != null : "Customer Id is null";
+        assert bookDto.getDropLocation() != null : "Drop Location is null";
+        assert bookDto.getPickupLocation() != null : "Pickup Location is null";
         RideDto rideDto = new RideDto();
         rideDto.setPassengerMobileNumber(bookDto.getPassengerMobileNumber());
         rideDto.setPickupLocation(new LocationDto(bookDto.getPickupLocation()));
@@ -349,6 +352,7 @@ public class RideServiceImpl implements RideService {
      *
      */
     public RideDto submitFeedBack(Integer rideId, RatingDto ratingDto) {
+
         Ride ride = fetchRideById(rideId);
         Cab cab = ride.getCab();
 
