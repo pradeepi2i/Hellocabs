@@ -8,8 +8,11 @@ package com.hellocabs.dto;
 
 import com.hellocabs.constants.HelloCabsConstants;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
@@ -30,6 +33,9 @@ import java.time.LocalDateTime;
  */
 @Data
 @Validated
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StatusDto {
 
     @NotBlank(message = HelloCabsConstants.RIDE_STATUS_NOT_BLANK)

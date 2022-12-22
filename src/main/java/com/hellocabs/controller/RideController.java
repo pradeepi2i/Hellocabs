@@ -78,8 +78,9 @@ public class RideController {
      */
     @GetMapping
     private ResponseEntity<?> retrieveRides() {
-        return HelloCabsResponseHandler.generateResponse(HelloCabsConstants.RIDE_FOUND,
+        ResponseEntity<?> response = HelloCabsResponseHandler.generateResponse(HelloCabsConstants.RIDE_FOUND,
                 HttpStatus.FOUND, rideService.retrieveRides());
+        return response;
     }
 
     /**
@@ -96,7 +97,7 @@ public class RideController {
     @PutMapping
     private ResponseEntity<?> updateRide(@Valid @RequestBody RideDto rideDto) {
         return HelloCabsResponseHandler.generateResponse(HelloCabsConstants.RIDE_UPDATED,
-                HttpStatus.OK, rideDto);
+                HttpStatus.OK, rideService.updateRide(rideDto));
     }
 
     /**
@@ -200,16 +201,16 @@ public class RideController {
      *   the ride for some reason
      * </p>
      *
-     * @param feedBackDto {@link ReasonDto} feedback of the ride
+     * @param reasonDto {@link ReasonDto} feedback of the ride
      * @param rideId {@link Integer} update rating for the ride
      * @return {@link ResponseEntity<Object>} ride cancellation
      *
      */
     @DeleteMapping("{rideId}")
     private ResponseEntity<?> deleteRideById(@Valid @RequestBody
-            ReasonDto feedBackDto, @PathVariable Integer rideId) {
+            ReasonDto reasonDto, @PathVariable Integer rideId) {
         return HelloCabsResponseHandler.generateResponse(
-                rideService.deleteRide(rideId, feedBackDto),
+                rideService.deleteRide(rideId, reasonDto),
                 HttpStatus.OK);
     }
 }

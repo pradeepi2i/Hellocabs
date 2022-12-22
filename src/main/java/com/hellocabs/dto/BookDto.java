@@ -8,8 +8,11 @@ package com.hellocabs.dto;
 
 import com.hellocabs.constants.HelloCabsConstants;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
+import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
@@ -27,6 +30,9 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Validated
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class BookDto {
 
     private Long passengerMobileNumber;

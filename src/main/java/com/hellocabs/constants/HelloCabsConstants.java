@@ -53,7 +53,7 @@ public class HelloCabsConstants {
     public static final String CAB_CATEGORY_FOUND = "Cab category found for given id";
     public static final String CAB_FOUND = "Cab found for given id";
     public static final String CUSTOMER_FOUND = "Customer found for given id";
-    public static final String RIDE_FOUND = "Ride found ";
+    public static final String RIDE_FOUND = "Ride found";
     public static final String ALL_CAB_CATEGORIES_FOUND = "Found all cab categories";
     public static final String ALL_LOCATIONS_FOUND = "Found all locations";
 
@@ -75,7 +75,7 @@ public class HelloCabsConstants {
     public static final String CUSTOMER_REGISTERED = "Customer registered successfully ";
 
     //UPDATED
-    public static final String LOCATION_UPDATED = "Location updated ";
+    public static final String LOCATION_UPDATED = "Location updated";
     public static final String CAB_CATEGORY_UPDATED = "Cab category updated";
     public static final String CAB_UPDATED = "Cab updated";
     public static final String CUSTOMER_UPDATED = "Customer updated";
