@@ -69,9 +69,10 @@ public class RideServiceImpl implements RideService {
      *
      */
     private Ride createRide(RideDto rideDto) {
-        Ride ride = rideRepository.save(RideMapper
-                .convertRideDtoIntoRide(rideDto));
-        logger.info(HelloCabsConstants.RIDE_CREATED + ride.getId());
+        Ride convertedRide = RideMapper
+                .convertRideDtoIntoRide(rideDto);
+        Ride ride = rideRepository.save(convertedRide);
+//        logger.info(HelloCabsConstants.RIDE_CREATED + ride.getId());
         return ride;
     }
 

@@ -1,12 +1,18 @@
 package com.hellocabs.service.impl;
 
+import com.hellocabs.dto.CabDto;
 import com.hellocabs.exception.HelloCabsException;
+import com.hellocabs.mapper.CabMapper;
 import com.hellocabs.model.Cab;
 import com.hellocabs.repository.CabRepository;
+import com.hellocabs.service.CabService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.stream.Collectors;
@@ -15,15 +21,18 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class CabServiceImplTest {
 
     @Mock
     private CabRepository cabRepository;
+    @InjectMocks
+    private CabServiceImpl cabService;
     private Cab cab;
     private Cab savedCab;
 
@@ -34,12 +43,13 @@ public class CabServiceImplTest {
         cab.setCabNumber(null);
         cab.setDriverName(null);
         cab.setGender(null);
-        cab.setMobileNumber(null);
+        cab.setMobileNumber(9876543210L);
         cab.setDriverRating(null);
         cab.setCabStatus(null);
         cab.setEmail(null);
         cab.setLicenseNumber(null);
         cab.setCarModel(null);
+        cab.setPassword("fhrfhcrifuqhfu");
     }
 
     /**
@@ -49,9 +59,12 @@ public class CabServiceImplTest {
     @Test
     @DisplayName("Check the given object and saved object are equal")
     public void createCab() {
-        when(cabRepository.save(cab)).thenReturn(cab);
+        CabDto cabDto = new CabDto();
+        cabDto.setId(1);
+        cabDto.setMobileNumber(8765432190L);
+        given(cabService.createCab(cabDto)).willReturn(cabDto);
         savedCab = cabRepository.save(cab);
-        assertEquals(cab, savedCab);
+        assertEquals(cabDto.getId(), savedCab.getId());
     }
 
     /**

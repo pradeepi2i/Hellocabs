@@ -60,7 +60,7 @@ public class CabServiceImpl implements CabService {
         if (HelloCabsValidation.isValidMobileNumber(cabDto.getMobileNumber())
                 && !cabRepository.existsByMobileNumberOrEmail(
                         cabDto.getMobileNumber(), cabDto.getEmail())) {
-            cabDto.setPassword(passwordEncoder.encode(cabDto.getPassword()));
+            cabDto.setPassword((cabDto.getPassword()));
             Cab cab = cabRepository.save(CabMapper.convertCabDtoToCab(cabDto));
             logger.info(HelloCabsConstants.CAB_CREATED + cab.getId());
             return CabMapper.convertCabToCabDto(cab);

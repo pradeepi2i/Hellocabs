@@ -5,26 +5,31 @@
 
 package com.hellocabs.service.impl;
 
+import com.hellocabs.dto.BookDto;
+import com.hellocabs.dto.LocationDto;
+import com.hellocabs.dto.RideDto;
 import com.hellocabs.exception.HelloCabsException;
+import com.hellocabs.mapper.RideMapper;
 import com.hellocabs.model.Location;
 import com.hellocabs.model.Ride;
 import com.hellocabs.repository.RideRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Class with set of test functions which are used to test both
@@ -35,13 +40,15 @@ import static org.mockito.Mockito.when;
  * @version 1.0
  *
  */
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class RideServiceImplTest {
-
-    @Mock
-    private RideRepository rideRepository;
     private Ride ride;
-    private Ride savedRide;
+    private RideDto rideDto;
+    private RideDto savedRide;
+    @Mock
+    private RideRepository rideRepository = mock(RideRepository.class);
+    @InjectMocks
+    private RideServiceImpl rideService;
     @Mock
     private CabServiceImplTest cabServiceImplTest;
 
@@ -60,6 +67,20 @@ public class RideServiceImplTest {
         ride.setRidePickedTime(LocalDateTime.parse("2022-11-05T13:58:29"));
         ride.setPassengerMobileNumber(Long.valueOf("9876543212"));
         ride.setRideStatus("Cancelled");
+
+        rideDto = new RideDto();
+        rideDto.setId(1);
+        LocationDto pickupLocationDto = new LocationDto();
+        pickupLocation.setId(2);
+        rideDto.setPickupLocation(pickupLocationDto);
+        LocationDto dropLocationDto = new LocationDto();
+        dropLocation.setId(6);
+        rideDto.setDropLocation(dropLocationDto);
+        rideDto.setRideBookedTime(LocalDateTime.parse("2022-11-03T19:21:57"));
+        rideDto.setRidePickedTime(LocalDateTime.parse("2022-11-05T13:58:29"));
+        rideDto.setPassengerMobileNumber(Long.valueOf("9876543212"));
+        rideDto.setRideStatus("Cancelled");
+
     }
 
     /**
@@ -69,8 +90,14 @@ public class RideServiceImplTest {
     @Test
     @DisplayName("Check the given object and saved object are equal")
     public void bookRide() {
-        when(rideRepository.save(ride)).thenReturn(ride);
-        assertEquals(ride, rideRepository.save(ride), "Both are same");
+        BookDto bookDto = new BookDto();
+        bookDto.setPickupLocation(2);
+        bookDto.setDropLocation(3);
+        bookDto.setCustomerId(5);
+        bookDto.setPassengerMobileNumber(7654321890L);
+        when(rideRepository.save(any())).thenReturn(ride);
+        RideDto savedRide = rideService.bookRide(bookDto);
+        assertEquals(savedRide.getId(), ride.getId());
     }
 
     /**
@@ -80,9 +107,11 @@ public class RideServiceImplTest {
     @Test
     @DisplayName("Fetch Success:Get ride using id")
     public void getRideSuccess() {
+        Ride saved = rideRepository.save(ride);
         when(rideRepository.getById(1)).thenReturn(ride);
-        savedRide = rideRepository.getById(1);
-        assertEquals(1, savedRide.getId());
+        Optional<Ride> savedDto1 = rideRepository.findById(1);
+        savedRide = rideService.searchRideById(1);
+        assertEquals(ride.getId(), savedRide.getId());
     }
 
     /**
@@ -94,7 +123,7 @@ public class RideServiceImplTest {
     public void getRideFailure() {
         when(rideRepository.getById(0)).thenThrow(new HelloCabsException("Invalid Id"));
         Throwable exception = assertThrows(HelloCabsException.class, () -> rideRepository.getById(0));
-        assertEquals("Ride", exception.getMessage());
+        assertEquals("Invalid Id", exception.getMessage());
     }
 
     /**
@@ -114,9 +143,10 @@ public class RideServiceImplTest {
     @Test
     @DisplayName("Update Ride Success")
     public void updateRideSuccess() {
-        when(rideRepository.save(ride)).thenReturn(ride);
-        savedRide = rideRepository.save(ride);
-        assertEquals(ride, savedRide );
+        when(rideRepository.save(any())).thenReturn(ride);
+        ride.setRideStatus("Accepted");
+        savedRide = rideService.updateRide(RideMapper.convertRideIntoRideDto(ride));
+        assertEquals(ride.getRideStatus(), savedRide.getRideStatus() );
     }
 
     /**
@@ -126,11 +156,11 @@ public class RideServiceImplTest {
     @Test
     @DisplayName("Update Ride Failure : Ride update failed due to non-existed id")
     public void UpdateRideNonExistedId() {
-        Ride anotherRide = new Ride();
+        RideDto anotherRide = new RideDto();
         anotherRide.setId(2);
         when(rideRepository.save(ride)).thenReturn(ride);
-        savedRide = rideRepository.save(anotherRide);
-        assertNotEquals(ride, savedRide, "No Id found");
+        savedRide = rideService.updateRide(anotherRide);
+        assertNotEquals(ride.getId(), savedRide.getId(), "No Id found");
     }
 
     /**
@@ -141,8 +171,8 @@ public class RideServiceImplTest {
     @DisplayName("Update status Success")
     public void updateRideStatusSuccess() {
         ride.setRideStatus("Accepted");
-        when(rideRepository.save(ride)).thenReturn(ride);
-        savedRide = rideRepository.save(ride);
+        when(rideRepository.save(any())).thenReturn(ride);
+        savedRide = rideService.updateRide(RideMapper.convertRideIntoRideDto(ride));
         assertEquals("Accepted", savedRide.getRideStatus());
         assertNotEquals(ride, null);
     }
@@ -155,7 +185,7 @@ public class RideServiceImplTest {
     public void updateRideStatusEmptyString() {
         ride.setRideStatus("");
         when(rideRepository.save(ride)).thenReturn(ride);
-        savedRide = rideRepository.save(ride);
+        savedRide = rideService.updateRide(RideMapper.convertRideIntoRideDto(ride));
         assertEquals("", savedRide.getRideStatus());
     }
 
@@ -167,7 +197,7 @@ public class RideServiceImplTest {
     public void updateRideStatusNull() {
         ride.setRideStatus(null);
         when(rideRepository.save(ride)).thenReturn(ride);
-        savedRide = rideRepository.save(ride);
+        savedRide = rideService.updateRide(RideMapper.convertRideIntoRideDto(ride));
         assertEquals(null, savedRide.getRideStatus());
     }
 
